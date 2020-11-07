@@ -1,4 +1,4 @@
-# `velour`
+# velour
 
 Python package for topological inference from point clouds with persistent homology.
 Based on the [`gudhi`](https://gudhi.inria.fr/python/latest/)  library.
