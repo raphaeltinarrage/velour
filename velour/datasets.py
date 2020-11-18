@@ -132,21 +132,24 @@ def SampleOnLemniscate(N_observation = 100, N_anomalous = 50):
     
     return data
 
-def SampleOnSphere(N_observation = 100, N_anomalous = 0, is_plot = False):
+def SampleOnSphere(N_observation = 100, N_anomalous = 0):
     '''
     Sample N_observation points from the uniform distribution on the unit sphere 
     in R^3, and N_anomalous points from the uniform distribution on the unit cube.
         
-    Input : 
+    Input: 
         N_observation (int): number of sample points on the sphere.
         N_anomalous (int): number of sample points on the cube.
     
-    Output : 
+    Output: 
         data (np.array): size (N_observation + N_anomalous)x3, the points concatenated. 
+        
+    Example:
+        X = SampleOnSphere(N_observation = 100, N_anomalous = 0)
+        velour.PlotPointCloud(X)
     '''
-    RAND_obs = np.random.rand(3, N_observation)*2-1
-    norms = np.multiply(RAND_obs, RAND_obs)
-    norms = np.sum(norms.T, 1).T
+    RAND_obs = np.random.normal(0, 1,  (3, N_observation))
+    norms = np.sum(np.multiply(RAND_obs, RAND_obs).T, 1).T
     X_obs = RAND_obs[0,:]/np.sqrt(norms)
     Y_obs = RAND_obs[1,:]/np.sqrt(norms)
     Z_obs = RAND_obs[2,:]/np.sqrt(norms)    
@@ -580,15 +583,18 @@ def PlotPersistenceBarcodes(st, tmax = 1, d=2, eps = 0, hide_small_infinite_bars
             ax.spines['top'].set_visible(False)     
             plt.title('H'+str(i)+'-barcode')
             
-def PlotLifebar(Lifebar, filtration_max):
+def PlotLifebar(Lifebar, filtration_max, plot_lifebar_curve = False):
     '''
     Plot the lifebar corresponding to the array Lifebar. The lifebar is a bar that 
     is hatched until the value t_dagger, and then solid until the value filtration_max.
     The value t_dagger is defined as the first value for which I is nonzero.
+    If plit_lifebar_curve == True, plot the actual computed lifebar, which can 
+    takes values different from 0 or 1 because of the non-simpliciality of the map.
     
     Input:
         Lifebar (np.array): size 1xN.
         filtration_max (float): the maximal filtration value.
+        plot_lifebar_curve (bool)
     '''
     # Parameters of the lifebar
     width = 0.5   #width bar
@@ -614,6 +620,8 @@ def PlotLifebar(Lifebar, filtration_max):
     ax.spines['left'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)     
-    #ax.plot(I,Lifebar*width, lw=5, c='black')  #plot of the actual computed lifebar, 
-                                               #which can takes values different from 0 or 1 
-                                               #because of the non-simpliciality of g
+    
+    if plot_lifebar_curve:
+        ax.plot(I,Lifebar*width, lw=5, c='black')  #plot of the actual computed lifebar, 
+                                                   #which can takes values different from 0 or 1 
+                                                   #because of the non-simpliciality of g
