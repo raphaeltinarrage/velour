@@ -23,12 +23,10 @@ It can be installed from PyPI via
 ```
 pip install velour
 ```
+Current release: 2020.11.18
+
 ## Documentation
 
-Not yet! But feel to contact me anytime :upside_down_face:
+Not yet! But feel free to contact me anytime.
 
 Raphaël Tinarrage - https://raphaeltinarrage.github.io/
-
-## Current version 
-
-Release 2020.11.18
