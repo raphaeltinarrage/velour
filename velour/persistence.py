@@ -96,11 +96,7 @@ def GetVerticesSimplexTree(st):
         velour.GetVerticesSimplexTree(st)
         ---> [0, 2, 258]
     '''
-    Vertices = []
-    for filtr in st.get_filtration():
-        simplex = filtr[0]
-        if len(simplex)==1:
-            Vertices.append(simplex[0])
+    Vertices = [simplex[0][0] for simplex in st.get_skeleton(0)]
     return Vertices
 
 def GetSimplicesSimplexTree(st, dim):
@@ -120,11 +116,7 @@ def GetSimplicesSimplexTree(st, dim):
         velour.GetSimplicesSimplexTree(st, dim=1)
         ---> [[0, 1], [0, 2], [1, 2]]
     '''
-    Simplices = []
-    for filtr in st.get_filtration():
-        simplex = filtr[0]
-        if len(simplex)==dim+1:
-            Simplices.append(simplex)
+    Simplices = [simplex[0] for simplex in st.get_skeleton(dim) if len(simplex[0])==dim+1]
     return Simplices
 
 def GetNeighborsSimplexTree(st, v, t=np.inf, closed = True):
@@ -594,7 +586,10 @@ def GetBettiCurves(st, I, homology_coeff_field = 2, dim=0):
     
     Output:
         BettiCurves (np.array): the Betti curves. Shape (dim)x100. The ith 
-                                Betti curve is given by BettiCurve[i,:].       
+                                Betti curve is given by BettiCurve[i,:].  
+                                
+    Remark:
+        Optimization by Marc Glisse in https://github.com/GUDHI/gudhi-devel/pull/423/files
 
     Example:
         st = gudhi.SimplexTree()
@@ -609,20 +604,21 @@ def GetBettiCurves(st, I, homology_coeff_field = 2, dim=0):
     if dim == 0:
         dim = st.dimension()
         
-#    st.compute_persistence()
-#    diag = [st.persistence_intervals_in_dimension(i) for i in range(dim)]
-#    bc = gudhi.representations.vector_methods.BettiCurve(resolution=100, sample_range=[0,filtration_max])
-#    BettiCurves = bc.transform(diag)
-
-    BettiCurves = np.zeros((dim+1, np.size(I)))
     st.persistence(persistence_dim_max=True, homology_coeff_field = homology_coeff_field)
+    Diagrams = [st.persistence_intervals_in_dimension(i) for i in range(dim+1)]
+
+    BettiCurves = []
+    step_x = I[1]-I[0]
+
+    for diagram in Diagrams:
+        bc =  np.zeros(len(I))
+        if diagram.size != 0:
+            diagram_int = np.clip(np.ceil((diagram[:,:2] - I[0]) / step_x), 0, len(I)).astype(int)
+            for interval in diagram_int:
+                bc[interval[0]:interval[1]] += 1
+        BettiCurves.append(np.reshape(bc,[1,-1]))
         
-    for d in range(dim+1):    
-        for interval in st.persistence_intervals_in_dimension(d):
-            for i in range(len(I)):
-                if interval[0] <= I[i] and interval[1] >= I[i]:
-                    BettiCurves[d,i] += 1
-    return BettiCurves
+    return np.reshape(BettiCurves, (dim+1, len(I)))
 
 def RipsComplex(X, filtration_max=np.inf, dimension_max=3):
     '''
