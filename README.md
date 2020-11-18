@@ -28,3 +28,7 @@ pip install velour
 Not yet! But feel to contact me anytime :upside_down_face:
 
 Raphaël Tinarrage - https://raphaeltinarrage.github.io/
+
+## Current version 
+
+Release 2020.11.18
