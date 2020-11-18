@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="velour", 
-    version="2020.11.07.1",
+    version="2020.11.18",
     author="Raphaël Tinarrage",
     author_email="raphael.tinarrage@gmail.com",
     description="Topological inference from point clouds with persistent homology",
